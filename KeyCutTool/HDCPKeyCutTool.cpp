@@ -172,9 +172,12 @@ int HDCPKeyCutTool::readKeyCountFormat1(FILE * InFile, int headLength) {
 
 
 int HDCPKeyCutTool::openFiles(char * inFile, char* outFile) {
-	InFile = fopen(inFile, "rb");
-	OutFile = fopen(outFile, "ab");
-	if (InFile == NULL || OutFile == NULL) {
+	//InFile = fopen(inFile, "rb");
+	//OutFile = fopen(outFile, "ab");
+	//if (InFile == NULL || OutFile == NULL) {
+	//	return -1;
+	//}
+	if ((fopen_s(&InFile, inFile, "rb") != 0) || (fopen_s(&OutFile, outFile, "ab") != 0)) {
 		return -1;
 	}
 	return 0;
@@ -247,13 +250,16 @@ return : 0: Checked ok. 1: The file can't be open. 2:headLength not mach the fil
 int HDCPKeyCutTool::checkKeyFormat(char * inFile, int headLength, int keyLength, int keyCountFormat, int aimkeyCountFormat) {
 	//1. check inFile
 	FILE * tempInFile;
-	tempInFile = fopen(inFile, "rb");
-	if (tempInFile == NULL) {
-		//open file failed
+	if (fopen_s(&tempInFile, inFile, "rb") != 0) {
 		cout << "Open Key File Error!" << endl;
-		fclose(tempInFile);
 		return 1;// return 1,means the key file can not be opened.Maybe it is not exist.
 	}
+	//tempInFile = fopen(inFile, "rb");
+	//if (tempInFile == NULL) {
+	//	//open file failed
+	//	cout << "Open Key File Error!" << endl;
+	//	return 1;// return 1,means the key file can not be opened.Maybe it is not exist.
+	//}
 
 	//2. check headLength
 	fseek(tempInFile, 0, SEEK_END);

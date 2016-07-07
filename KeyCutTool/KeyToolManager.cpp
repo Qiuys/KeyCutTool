@@ -6,8 +6,13 @@ using namespace std;
 param in : Url of the file.Type: char* , Format: E:/work/VS/tempTestKey/HDCP_KEY_testkey.bin
 return : 0 : File opened successfully. -1 File opened failed.*/
 int KeyToolManager::setInFile(char * in) {
-	FILE * InFile = fopen(in, "rb");
-	if (InFile == NULL) {
+	//FILE * InFile = fopen(in, "rb");
+	//if (InFile == NULL) {
+	//	cout << "Key file is not exist!" << endl;
+	//	return -1;
+	//}
+	FILE * InFile = NULL;
+	if (fopen_s(&InFile,in, "rb") != 0) {
 		cout << "Key file is not exist!" << endl;
 		return -1;
 	}
@@ -35,8 +40,10 @@ int KeyToolManager::setOutFile(char * out, char * fprefix) {
 	int outLen = strlen(out);
 	if (out[outLen - 1] != '/') {
 		char * aimOut = (char *)malloc(1024);
-		strcpy(aimOut, out);
-		strcat(aimOut, "/");
+		//strcpy(aimOut, out);
+		//strcat(aimOut, "/");
+		strcpy_s(aimOut, 1024,out);
+		strcat_s(aimOut, 1024,"/");
 		out = aimOut;
 	}
 
@@ -66,8 +73,10 @@ int KeyToolManager::setOutFile(char * out, char * fprefix) {
 	char * dest = NULL;
 	dest = (char *)malloc(1024);
 	char * postfix = "*.*";
-	strcpy(dest, out);
-	strcat(dest, postfix);
+	//strcpy(dest, out);
+	//strcat(dest, postfix);
+	strcpy_s(dest, 1024,out);
+	strcat_s(dest, 1024,postfix);
 
 	CString csout = dest;
 	CFileFind cff;
@@ -152,24 +161,34 @@ int KeyToolManager::startCut() {
 
 	for (int i = 1;i <= filesCount;i++) {
 		char newfileName[1024] = "";
-		strcpy(newfileName, outFolder);//构造文件名前缀
-		strcat(newfileName, filePrefix);
+		//strcpy(newfileName, outFolder);//构造文件名前缀
+		//strcat(newfileName, filePrefix);
+		strcpy_s(newfileName, 1024,outFolder);//构造文件名前缀
+		strcat_s(newfileName, 1024,filePrefix);
 
 		char newKeyFirstLocString[1024] = "";
-		_itoa((newKeyLoc + 1), newKeyFirstLocString, 10);
-		strcat(newfileName, newKeyFirstLocString);//将起始key编号写到文件名中
+		//_itoa((newKeyLoc + 1), newKeyFirstLocString, 10);
+		//strcat(newfileName, newKeyFirstLocString);//将起始key编号写到文件名中
+		_itoa_s((newKeyLoc + 1), newKeyFirstLocString, 10);
+		strcat_s(newfileName, 1024,newKeyFirstLocString);//将起始key编号写到文件名中
 
-		strcat(newfileName, "_");
+		//strcat(newfileName, "_");
+		strcat_s(newfileName, 1024,"_");
 
 		char newKeyLastLocString[1024] = "";
-		_itoa((newKeyLoc + newKeyCount), newKeyLastLocString, 10);
-		strcat(newfileName, newKeyLastLocString);//将末尾key编号写到文件名中
+		//_itoa((newKeyLoc + newKeyCount), newKeyLastLocString, 10);
+		//strcat(newfileName, newKeyLastLocString);//将末尾key编号写到文件名中
+		_itoa_s((newKeyLoc + newKeyCount), newKeyLastLocString, 10);
+		strcat_s(newfileName, 1024,newKeyLastLocString);//将末尾key编号写到文件名中
 
-		strcat(newfileName, "_");
+		//strcat(newfileName, "_");
+		strcat_s(newfileName, 1024,"_");
 
-		char newKeyCountString[100];
-		_itoa(newKeyCount, newKeyCountString, 10);
-		strcat(newfileName, newKeyCountString);//将key数量写到文件名中
+		char newKeyCountString[1024];
+		//_itoa(newKeyCount, newKeyCountString, 10);
+		//strcat(newfileName, newKeyCountString);//将key数量写到文件名中
+		_itoa_s(newKeyCount, newKeyCountString, 10);
+		strcat_s(newfileName, 1024,newKeyCountString);//将key数量写到文件名中
 
 		HDCP_Tool->setOperatedFiles(inFile, newfileName);
 		HDCP_Tool->cutKeys(newKeyCount, newKeyLoc);
