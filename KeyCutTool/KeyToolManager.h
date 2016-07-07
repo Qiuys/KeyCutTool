@@ -9,8 +9,8 @@ public:
 	int setOutFile(char * out, char * filePrefix);
 	int setKeyType(int keyType);
 	int setHDCPKeyFormat(int headLength, int keyLength, int keyCountFormat, int aimkeyCountFormat);
-	int setHDCPKeySeperateParam(int KeyBeginNum, int KeyEachFile, int KeyFileCount);
-	int startSeperate();
+	int setHDCPKeyCutParam(int KeyBeginNum, int KeyEachFile, int KeyFileCount);
+	int startCut();
 
 private:
 	HDCPKeyCutTool * HDCP_Tool;

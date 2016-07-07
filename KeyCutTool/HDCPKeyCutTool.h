@@ -4,113 +4,41 @@
 #include <iostream>
 class HDCPKeyCutTool {
 public:
-	/*
-	parameter:
-	inFile:file path of input HDCP key file
-	outFile:file path  of target HDCP key file
-	*/
-	HDCPKeyCutTool(char * inFile, char* outFile);
-	HDCPKeyCutTool();
 	~HDCPKeyCutTool();
-
-	/*
-	Check the validity of given file.
-	param inFile : The file to be checked.
-	param headLength : The head of file is a field record the count of keys in this file.
-	headLength is the length(Byte) of this field.
-	param keyLength : The length of an individual key.
-	param keyCountFormat : The format of headLength.
-	return : 0: Checked ok. 1: The file can't be open. 2:headLength not mach the file.
-	3:keyLength not mach the file. 4:keyLength or keyCountFormat not mach the file.
-	*/
 	int checkKeyFormat(char * inFile, int headLength, int keyLength, int keyCountFormat, int aimkeyCountFormat);
-
-	//2.第二步，检查需要提取的key数量是否会超出key文件的范围
-	/*
-	param keyBeginNum : The number of first key to be seperated from file.
-	param keyCount : The count of keys to be seperated from file.
-	return : 0:Can be seperated successfully 1:param is unavailable
-	2:The keys in file are not enough
-	*/
 	int checkCommand(int keyBeginNum, int keyCount);
-
-	/*
-	parameter:
-	newKeyCount:the count of key that will seperated into target HDCP key file
-	newKeyLoc:the first index of key in input HDCP key file that begin to seperate into target HDCP key file
-	*/
-	int seperateKeys(int newKeyCount, int newKeyLoc);
-
+	int setOperatedFiles(char * inFile, char* outFile);
+	int cutKeys(int newKeyCount, int newKeyLoc);
+	void cleanOperatedFiles();
 private:
 	FILE * InFile, *OutFile;
-	int keyCount;//key count of input file
-	const static int keySize = 308;// size of one HDCP key
-	char tempKey[keySize];
+	int keyCount = 0 ;//key count of input file
+	int inHeadType = 1;//head type of the input file
+	int outHeadType = 1;//head type of the ouput files
+	int headLength = 4;//head length of key file
+	int keyLength = 308;// length of a single key
+
+	int getHDCPKeyCount1();
+	int getHDCPKeyCount2();
+	int getHDCPKeyCount3();
+
+	void setHDCPKeyCountHelp1(int sum, int* mm);
+	void setHDCPKeyCountHelp2(int sum, int* mm);
+	void setHDCPKeyCountHelp3(int sum, int* mm);
+
+	int setHDCPKeyCount1(int newKeyCount);
+	int setHDCPKeyCount2(int newKeyCount);
+	int setHDCPKeyCount3(int newKeyCount);
+
+	int readKeyCountFormat1(FILE * InFile, int headLength);
 
 	int openFiles(char * inFile, char* outFile);
 	void closeFiles();
-	/*
-	do not use this function
-	change number of key int  to int array
-	prepare to write into file
-	*/
-	void setHDCPKeyCountHelp(int sum, int* mm);
 
-	/*
-	change number of key int  to int array
-	prepare to write into file
-	*/
-	void setHDCPKeyCountHelpNew(int sum, int* mm);
-
-	void setHDCPKeyCountHelpThird(int sum, int* mm);
-
-	/*
-	do not use this function
-	*/
-	int getHDCPKeyCount();
-
-	/*
-	get HDCP key count from file
-	*/
-	int getHDCPKeyCountNew();
-
-	int getHDCPKeyCountThird();
-
-	int readKeyCountFormat1(FILE * InFile, int headLength);
-	/*
-	get a key from file then store in char* aKey.
-	return 0 when success
-	return -1 when fail
-	*/
 	int getOneKey(char* aKey);
-
-	/*
-	put a key to file
-	return the size of key
-	*/
 	int setOneKey(char* aKey);
 
-	/*
-	do not use this function
-	put 4 byte into file.represent the number of key in the file.
-	*/
-	int setHDCPKeyCount(int newKeyCount);
-
-	/*
-	put 4 byte into file.represent the number of key in the file.
-	*/
-	int setHDCPKeyCountNew(int newKeyCount);
-
-	int setHDCPKeyCountThird(int newKeyCount);
-
-	/*
-	get current key location in inFile
-	*/
 	int getLocationOfKey();
-
-	/*
-	set a new key location in inFile
-	*/
 	int setLocationOfKey(int loc);
 };
 #endif
