@@ -275,9 +275,9 @@ get current key location in inFile
 */
 int HDCPKeyCutTool::getLocationOfKey() {
 	long loc = ftell(InFile);
-	if (loc < 3)
+	if (loc < (headLength-1))
 		return 0;
-	return (loc - 4) / keyLength;
+	return (loc - headLength) / keyLength;
 }
 
 /*
@@ -286,7 +286,7 @@ set a new key location in inFile
 int HDCPKeyCutTool::setLocationOfKey(int loc) {
 	if (loc >= keyCount || loc < 0)
 		return -1;
-	fseek(InFile, loc*keyLength + 4, SEEK_SET);
+	fseek(InFile, loc*keyLength + headLength, SEEK_SET);
 	return getLocationOfKey();
 }
 
