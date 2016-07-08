@@ -2,9 +2,11 @@
 #include <afx.h>
 using namespace std;
 
-/*Check the input file which to be seperated is available or not.
+/*
+Check the input file which to be seperated is available or not.
 param in : Url of the file.Type: char* , Format: E:/work/VS/tempTestKey/HDCP_KEY_testkey.bin
-return : 0 : File opened successfully. -1 File opened failed.*/
+return : 0 : File opened successfully. -1 File opened failed.
+*/
 int KeyToolManager::setInFile(char * in) {
 	//FILE * InFile = fopen(in, "rb");
 	//if (InFile == NULL) {
@@ -21,7 +23,8 @@ int KeyToolManager::setInFile(char * in) {
 	return 0;
 }
 
-/*Check the output folder and output file name prefix.
+/*
+Check the output folder and output file name prefix.
 param out: Url of the output folder. Type: char* , Format: E:/work/VS/tempTestKey/out or E:/work/VS/tempTestKey/out/
 param fprefix: Name of the new files which is seperated from the src key file. Type: char* , Format: HDCP_KEY
 return :0 set sucessfully. 1 out url or fprefix is empty. 2 TODO: space of the output disk is not enough.
@@ -99,10 +102,11 @@ int KeyToolManager::setOutFile(char * out, char * fprefix) {
 	return 0;
 }
 
-/*选择要分割的密钥类型keyType 当前只支持 keyType==1（HDCP key)*/
-/*Define which kind of key to be operated. Only support HDCP by far.
+/*
+Define which kind of key to be operated. Only support HDCP by far.
 param keyType: 1 is for HDCP
-return : 0 set sucessfully. 10 key type is not defined*/
+return : 0 set sucessfully. 10 key type is not defined
+*/
 int KeyToolManager::setKeyType(int keyType) {
 	cout << "Key Type is " << keyType << endl;
 	switch (keyType) {
@@ -118,13 +122,15 @@ int KeyToolManager::setKeyType(int keyType) {
 	return 0;
 }
 
-/*Define the format of HDCP key file.
+/*
+Define the format of HDCP key file.
 param headLength: The begining of key file is several byte that indicate how many keys in the file (head).
 For example, there are 4 byte in a HDCP key file. This param define the how many bytes being used here.
 param keyLength: The length of a single key.(fixed length, bytes)
 param keyCountFormat: The format of head in src key file.
 param aimkeyCountFormat: The format of head in output key files
-return: 0 set sucessfully. 1 set failed,please check the param.*/
+return: 0 set sucessfully. 1 set failed,please check the param.
+*/
 int KeyToolManager::setHDCPKeyFormat(int headLength, int keyLength, int keyCountFormat, int aimkeyCountFormat) {
 	if (HDCP_Tool->checkKeyFormat(inFile, headLength, keyLength, keyCountFormat, aimkeyCountFormat) != 0) {
 		return 1;
@@ -132,7 +138,8 @@ int KeyToolManager::setHDCPKeyFormat(int headLength, int keyLength, int keyCount
 	return 0;
 }
 
-/*Determine the quantity of HDCP keys to be cutted from the src HDCP key file.
+/*
+Determine the quantity of HDCP keys to be cutted from the src HDCP key file.
 param keyBeginNum: Cut the keys in src file beginning with this key.
 param keyEachFile: How many keys in a single output key file.
 param keyFileCount: How many key files will be created.
@@ -154,47 +161,53 @@ int KeyToolManager::setHDCPKeyCutParam(int keyBeginNum, int keyEachFile, int key
 	return 0;
 }
 
+/*
+Call this function to cut keys from src key file and generate dest key files.
+return: 0 work fine.
+*/
 int KeyToolManager::startCut() {
-	int newKeyLoc = keyBeginNum - 1;//起始下标
-	int newKeyCount = keyEachFile;//每个文件要包含多少个KEY
-	int filesCount = keyFileCount;//247;//总共要多少个文件
+	int newKeyLoc = keyBeginNum - 1;//Index of a key,like 0/1/2 ...
+	int newKeyCount = keyEachFile;//How many keys will be cutted into one key file.
+	int filesCount = keyFileCount;//How many dest key files will be created.
 
 	for (int i = 1;i <= filesCount;i++) {
 		char newfileName[1024] = "";
-		//strcpy(newfileName, outFolder);//构造文件名前缀
+		//strcpy(newfileName, outFolder);
 		//strcat(newfileName, filePrefix);
-		strcpy_s(newfileName, 1024,outFolder);//构造文件名前缀
-		strcat_s(newfileName, 1024,filePrefix);
+		strcpy_s(newfileName, 1024,outFolder);//absolute path of dest output folder
+		strcat_s(newfileName, 1024,filePrefix);//prefix of dest key file name
+
+		strcat_s(newfileName, 1024, "_");
 
 		char newKeyFirstLocString[1024] = "";
 		//_itoa((newKeyLoc + 1), newKeyFirstLocString, 10);
-		//strcat(newfileName, newKeyFirstLocString);//将起始key编号写到文件名中
+		//strcat(newfileName, newKeyFirstLocString);
 		_itoa_s((newKeyLoc + 1), newKeyFirstLocString, 10);
-		strcat_s(newfileName, 1024,newKeyFirstLocString);//将起始key编号写到文件名中
+		strcat_s(newfileName, 1024,newKeyFirstLocString);//first key's number is
 
 		//strcat(newfileName, "_");
 		strcat_s(newfileName, 1024,"_");
 
 		char newKeyLastLocString[1024] = "";
 		//_itoa((newKeyLoc + newKeyCount), newKeyLastLocString, 10);
-		//strcat(newfileName, newKeyLastLocString);//将末尾key编号写到文件名中
+		//strcat(newfileName, newKeyLastLocString);
 		_itoa_s((newKeyLoc + newKeyCount), newKeyLastLocString, 10);
-		strcat_s(newfileName, 1024,newKeyLastLocString);//将末尾key编号写到文件名中
+		strcat_s(newfileName, 1024,newKeyLastLocString);//last key's number 
 
 		//strcat(newfileName, "_");
 		strcat_s(newfileName, 1024,"_");
 
 		char newKeyCountString[1024];
 		//_itoa(newKeyCount, newKeyCountString, 10);
-		//strcat(newfileName, newKeyCountString);//将key数量写到文件名中
+		//strcat(newfileName, newKeyCountString);
 		_itoa_s(newKeyCount, newKeyCountString, 10);
-		strcat_s(newfileName, 1024,newKeyCountString);//将key数量写到文件名中
+		strcat_s(newfileName, 1024,newKeyCountString);//key quantity is a part of dest key file name
 
 		HDCP_Tool->setOperatedFiles(inFile, newfileName);
 		HDCP_Tool->cutKeys(newKeyCount, newKeyLoc);
 		HDCP_Tool->cleanOperatedFiles();
 
-		newKeyLoc += newKeyCount;//更新下标
+		newKeyLoc += newKeyCount;//update index for next loop
 	}
 	return 0;
 }

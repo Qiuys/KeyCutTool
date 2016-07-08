@@ -66,9 +66,12 @@ int HDCPKeyCutTool::getHDCPKeyCount3() {
 }
 
 /*
-change number of key int  to int array
+Change quantity of key from int to int array
 prepare to write into file which head type is 1
-1000个key写为 00 00 03 E8
+Type 1 : 00 00 03 E8 represent 1000
+param sum: interget to write to head.
+param mm: a temp int array to store changed-format sum.
+return void.
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp1(int sum, int* mm) {
 	int total = 0;
@@ -79,9 +82,12 @@ void HDCPKeyCutTool::setHDCPKeyCountHelp1(int sum, int* mm) {
 }
 
 /*
-change number of key int  to int array
+Change quantity of key from int to int array
 prepare to write into file which head type is 2
-1000个key写为 00 00 0A 00
+Type 2 : 00 00 0A 00 represent 1000
+param sum: interget to write to head.
+param mm: a temp int array to store changed-format sum.
+return void.
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp2(int sum, int* mm) {
 	//int weight = 1000000;
@@ -97,9 +103,12 @@ void HDCPKeyCutTool::setHDCPKeyCountHelp2(int sum, int* mm) {
 }
 
 /*
-change number of key int  to int array
+Change quantity of key from int to int array
 prepare to write into file which head type is 3
-1000个key写为 00 00 10 00
+Type 3 : 00 00 10 00 represent 1000
+param sum: interget to write to head.
+param mm: a temp int array to store changed-format sum.
+return void.
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp3(int sum, int* mm) {
 	int m;
@@ -119,8 +128,11 @@ void HDCPKeyCutTool::setHDCPKeyCountHelp3(int sum, int* mm) {
 }
 
 /*
-put 4 byte into file.represent the number of key in the file which type is 1
-这个是将1000个key显示为 00 00 03 E8
+Head of key file is serval bytes representing key quantity.
+This function writes head of the dest key file which head type is Type 1.
+Type 1 : 00 00 03 E8 represent 1000
+param newKeyCount: The quantity of key in the new key file
+return: 0 work fine. -1 param less then 0
 */
 int HDCPKeyCutTool::setHDCPKeyCount1(int newKeyCount) {
 	if (newKeyCount < 0)
@@ -135,8 +147,11 @@ int HDCPKeyCutTool::setHDCPKeyCount1(int newKeyCount) {
 }
 
 /*
-put 4 byte into file.represent the number of key in the file which type is 2
-这个是将1000个key显示为 00 00 0A 00
+Head of key file is serval bytes representing key quantity.
+This function writes head of the dest key file which head type is Type 2.
+Type 2 : 00 00 0A 00 represent 1000
+param newKeyCount: The quantity of key in the new key file
+return: 0 work fine. -1 param less then 0
 */
 int HDCPKeyCutTool::setHDCPKeyCount2(int newKeyCount) {
 	if (newKeyCount < 0)
@@ -151,8 +166,11 @@ int HDCPKeyCutTool::setHDCPKeyCount2(int newKeyCount) {
 }
 
 /*
-put 4 byte into file.represent the number of key in the file which type is 3
-这个是将1000个key写为 00 00 10 00
+Head of key file is serval bytes representing key quantity.
+This function writes head of the dest key file which head type is Type 3.
+Type 3 : 00 00 10 00 represent 1000
+param newKeyCount: The quantity of key in the new key file
+return: 0 work fine. -1 param less then 0
 */
 int HDCPKeyCutTool::setHDCPKeyCount3(int newKeyCount) {
 	if (newKeyCount < 0)
@@ -166,8 +184,13 @@ int HDCPKeyCutTool::setHDCPKeyCount3(int newKeyCount) {
 	return 0;
 }
 
-/*Get key quantity from head in which type is 1.
-1000个key显示为 00 00 03 E8*/
+/*
+Read key quantity from src key file head which is Type 1.
+Type 1 : 00 00 03 E8 represent 1000
+param InFile: The src file to be cutted.
+param headLength: Length of head.
+return: The quantity represented by head.
+*/
 int HDCPKeyCutTool::readKeyCountFormat1(FILE * InFile, int headLength) {
 	int m;//current byte that getted from file
 	int sum = 0;//count of key
@@ -184,8 +207,13 @@ int HDCPKeyCutTool::readKeyCountFormat1(FILE * InFile, int headLength) {
 	return sum;
 }
 
-/*Get key quantity from head in which type is 2.
-1000个key显示为 00 00 0A 00*/
+/*
+Read key quantity from src key file head which is Type 2.
+Type 2 : 00 00 0A 00 represent 1000
+param InFile: The src file to be cutted.
+param headLength: Length of head.
+return: The quantity represented by head.
+*/
 int HDCPKeyCutTool::readKeyCountFormat2(FILE * InFile, int headLength) {
 	int m;//current byte that getted from file
 	int sum = 0;//count of key
@@ -202,8 +230,13 @@ int HDCPKeyCutTool::readKeyCountFormat2(FILE * InFile, int headLength) {
 	return sum;
 }
 
-/*Get key quantity from head in which type is 3.
-1000个key显示为 00 00 10 00*/
+/* 
+Read key quantity from src key file head which is Type 3.
+Type 3 : 00 00 10 00 represent 1000
+param InFile: The src file to be cutted.
+param headLength: Length of head.
+return: The quantity represented by head.
+*/
 int HDCPKeyCutTool::readKeyCountFormat3(FILE * InFile, int headLength) {
 	int m;//current byte that getted from file
 	int sum = 0;//count of key
@@ -226,6 +259,12 @@ int HDCPKeyCutTool::readKeyCountFormat3(FILE * InFile, int headLength) {
 	return sum;
 }
 
+/*
+Open src key file and dest key file.Prepare to read and write.
+param inFile: Absolute path of src key file. Format: E:/work/VS/tempTestKey/HDCP_testkey.bin
+param outFile: Absolute path of dest key file. Format: E:/work/VS/tempTestKey/out/HDCP.bin_1_2_2
+return: 0 work fine. -1 file open failed.
+*/
 int HDCPKeyCutTool::openFiles(char * inFile, char* outFile) {
 	//InFile = fopen(inFile, "rb");
 	//OutFile = fopen(outFile, "ab");
@@ -238,6 +277,10 @@ int HDCPKeyCutTool::openFiles(char * inFile, char* outFile) {
 	return 0;
 }
 
+/*
+Close src and dest key file handler.
+return void.
+*/
 void HDCPKeyCutTool::closeFiles() {
 	if (InFile != NULL)
 		fclose(InFile);
@@ -246,9 +289,9 @@ void HDCPKeyCutTool::closeFiles() {
 }
 
 /*
-get a key from file then store in char* aKey.
-return 0 when success
-return -1 when fail
+Get a key from src key file and store it in char* aKey.
+param aKey: A char array to store a single key which read from src key file. 
+return: 0 read sucessfully. -1 read failed.
 */
 int HDCPKeyCutTool::getOneKey(char* aKey) {
 	int ret = fread(aKey, sizeof(char), keyLength, InFile);
@@ -259,8 +302,9 @@ int HDCPKeyCutTool::getOneKey(char* aKey) {
 }
 
 /*
-put a key to file
-return the size of key
+Write a key to dest key file.
+param aKey: A char array storing a single key which will be writed into dest key file.
+return: How many bytes have be written into dest key file.
 */
 int HDCPKeyCutTool::setOneKey(char* aKey) {
 	int i = 0;
@@ -271,17 +315,23 @@ int HDCPKeyCutTool::setOneKey(char* aKey) {
 }
 
 /*
-get current key location in inFile
+Help function used by setLocationOfKey.
+Get current key index in src kye file.
+return: index of the key.
 */
 int HDCPKeyCutTool::getLocationOfKey() {
 	long loc = ftell(InFile);
-	if (loc < (headLength-1))
-		return 0;
+	if (loc < (headLength-1))//doubt logic. please check it.
+		return -1;
 	return (loc - headLength) / keyLength;
 }
 
 /*
-set a new key location in inFile
+Map next key's index to its first byte location in src key file.
+In order to read next key from src key file.
+param loc: The index of next key. First key is 0.Second key is 1.
+			(After mapped, first HDCP key location is 4, second is 4+308)
+return: The index of next key. -1 param wrong.
 */
 int HDCPKeyCutTool::setLocationOfKey(int loc) {
 	if (loc >= keyCount || loc < 0)
@@ -290,9 +340,8 @@ int HDCPKeyCutTool::setLocationOfKey(int loc) {
 	return getLocationOfKey();
 }
 
-//1.第一步，检查输入的参数与key文件是否匹配。
 /*
-Check the validity of given parameters.
+Step 1.Check the validity of given parameters.
 param inFile : The file to be checked.
 param headLength : The head is a field record the count of keys in this file.
 headLength is the length(bytes) of this field.
@@ -384,9 +433,8 @@ int HDCPKeyCutTool::checkKeyFormat(char * inFile, int headLength, int keyLength,
 	return 0;
 }
 
-//2.第二步，检查需要提取的key数量是否会超出key文件的范围
 /*
-Check wether keys are enough or not.
+Step 2.Check wether keys are enough or not.
 param keyBeginNum : The number of first key to be seperated from file.
 param keyCount : The count of keys to be seperated from file.
 return : 0:Can be seperated successfully 1:param is unavailable
@@ -405,6 +453,13 @@ int HDCPKeyCutTool::checkCommand(int keyBeginNum, int keyCount) {
 	return 0;
 }
 
+/*
+After Everything are checked and prepared.
+Call this function to select the legal file path which will be operated soon.
+param inFile: A legal path of src key file.
+param outFile: A legal path of dest key file.
+return: 0 files opened successfully. -1 file opened failed.
+*/
 int HDCPKeyCutTool::setOperatedFiles(char * inFile, char * outFile) {
 	if (openFiles(inFile, outFile) != 0) {
 		cout << "Opening Files Error!" << endl;
@@ -413,14 +468,19 @@ int HDCPKeyCutTool::setOperatedFiles(char * inFile, char * outFile) {
 	return 0;
 }
 
+/*
+After keys operating is finish. Call this function to close the files.
+return void.
+*/
 void HDCPKeyCutTool::cleanOperatedFiles() {
 	closeFiles();
 }
 
 /*
-parameter:
-newKeyCount:the count of key that will seperated into target HDCP key file
-newKeyLoc:the first index of key in input HDCP key file that begin to seperate into target HDCP key file
+Call this function to cut keys.
+param newKeyCount: The quantity of key that will cutted into target HDCP key file.
+param newKeyLoc: The first index of key in src key file that begin to cut into dest key file.
+return: 0 work fine. others error occur
 */
 int HDCPKeyCutTool::cutKeys(int newKeyCount, int newKeyLoc) {
 	if (newKeyLoc < 0 || newKeyLoc >= keyCount || newKeyCount <= 0 || (newKeyLoc + newKeyCount)>keyCount) {
@@ -435,7 +495,7 @@ int HDCPKeyCutTool::cutKeys(int newKeyCount, int newKeyLoc) {
 
 	cout << "Cutting From Key Index " << newKeyLoc << endl;
 	cout << "Cutting Key Count " << newKeyCount << endl;
-	switch (outHeadType) {//不同的key计数格式需要选择不同的函数
+	switch (outHeadType) {
 	case 1:
 		setHDCPKeyCount1(newKeyCount);
 		break;

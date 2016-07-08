@@ -3,7 +3,7 @@
 int main() {
 	char * inputFile = "C:/Users/sorou/Desktop/testfolder/HDCP_KEY_10_1-10.bin";
 	char * outputFolder = "C:/Users/sorou/Desktop/testfolder/output";
-	char * newFileName = "HDCP_LIENCE_";
+	char * newFileName = "HDCP_LIENCE";
 	int keyType = 1; //HDCP
 	int headLength = 4;
 	int keyLength = 308;
