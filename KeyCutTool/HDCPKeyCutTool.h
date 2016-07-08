@@ -18,9 +18,9 @@ private:
 	int headLength = 4;//head length of key file
 	int keyLength = 308;// length of a single key
 
-	int getHDCPKeyCount1();
-	int getHDCPKeyCount2();
-	int getHDCPKeyCount3();
+	int getHDCPKeyCount1();//OUTDATED. DON'T USE.
+	int getHDCPKeyCount2();//OUTDATED. DON'T USE.
+	int getHDCPKeyCount3();//OUTDATED. DON'T USE.
 
 	void setHDCPKeyCountHelp1(int sum, int* mm);
 	void setHDCPKeyCountHelp2(int sum, int* mm);
@@ -31,6 +31,8 @@ private:
 	int setHDCPKeyCount3(int newKeyCount);
 
 	int readKeyCountFormat1(FILE * InFile, int headLength);
+	int readKeyCountFormat2(FILE * InFile, int headLength);
+	int readKeyCountFormat3(FILE * InFile, int headLength);
 
 	int openFiles(char * inFile, char* outFile);
 	void closeFiles();

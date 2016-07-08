@@ -6,6 +6,7 @@ HDCPKeyCutTool::~HDCPKeyCutTool() {
 }
 
 /*
+DO NOT USE THIS FUNCTION. PLEASE USE readKeyCountFormat1 INSTEAD!
 get HDCP key count from file which type is 1
 */
 int HDCPKeyCutTool::getHDCPKeyCount1() {
@@ -23,6 +24,7 @@ int HDCPKeyCutTool::getHDCPKeyCount1() {
 }
 
 /*
+DO NOT USE THIS FUNCTION. PLEASE USE readKeyCountFormat2 INSTEAD!
 get HDCP key count from file which type is 2
 */
 int HDCPKeyCutTool::getHDCPKeyCount2() {
@@ -40,6 +42,7 @@ int HDCPKeyCutTool::getHDCPKeyCount2() {
 }
 
 /*
+DO NOT USE THIS FUNCTION. PLEASE USE readKeyCountFormat3 INSTEAD!
 get HDCP key count from file which type is 3
 */
 int HDCPKeyCutTool::getHDCPKeyCount3() {
@@ -64,11 +67,12 @@ int HDCPKeyCutTool::getHDCPKeyCount3() {
 
 /*
 change number of key int  to int array
-prepare to write into file which type is 1
+prepare to write into file which head type is 1
+1000个key写为 00 00 03 E8
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp1(int sum, int* mm) {
 	int total = 0;
-	for (int i = 3;i >= 0;i--) {
+	for (int i = (headLength-1);i >= 0;i--) {
 		mm[i] = sum % 256;
 		sum = (sum - mm[i]) / 256;
 	}
@@ -76,11 +80,16 @@ void HDCPKeyCutTool::setHDCPKeyCountHelp1(int sum, int* mm) {
 
 /*
 change number of key int  to int array
-prepare to write into file which type is 2
+prepare to write into file which head type is 2
+1000个key写为 00 00 0A 00
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp2(int sum, int* mm) {
-	int weight = 1000000;
-	for (int i = 0;i < 4;i++) {
+	//int weight = 1000000;
+	int weight = 1;
+	for (int i = 1;i < headLength;i++) {
+		weight *= 100;
+	}
+	for (int i = 0;i < headLength;i++) {
 		mm[i] = sum / weight;
 		sum -= (weight*mm[i]);
 		weight /= 100;
@@ -89,13 +98,14 @@ void HDCPKeyCutTool::setHDCPKeyCountHelp2(int sum, int* mm) {
 
 /*
 change number of key int  to int array
-prepare to write into file which type is 3
+prepare to write into file which head type is 3
+1000个key写为 00 00 10 00
 */
 void HDCPKeyCutTool::setHDCPKeyCountHelp3(int sum, int* mm) {
 	int m;
 	int digit;
 
-	for (int i = 3;i >= 0;i--) {
+	for (int i = (headLength-1);i >= 0;i--) {
 		digit = sum % 10;
 		m = digit;
 		sum = (sum - digit) / 10;
@@ -115,9 +125,10 @@ put 4 byte into file.represent the number of key in the file which type is 1
 int HDCPKeyCutTool::setHDCPKeyCount1(int newKeyCount) {
 	if (newKeyCount < 0)
 		return -1;
-	int mm[4];
+	//int mm[4];
+	int* mm=new int[headLength];
 	setHDCPKeyCountHelp1(newKeyCount, mm);
-	for (int i = 0;i < 4;i++) {
+	for (int i = 0;i < headLength;i++) {
 		fputc(mm[i], OutFile);
 	}
 	return 0;
@@ -125,14 +136,15 @@ int HDCPKeyCutTool::setHDCPKeyCount1(int newKeyCount) {
 
 /*
 put 4 byte into file.represent the number of key in the file which type is 2
-这个是将1000个key显示为 00 00 0a 00
+这个是将1000个key显示为 00 00 0A 00
 */
 int HDCPKeyCutTool::setHDCPKeyCount2(int newKeyCount) {
 	if (newKeyCount < 0)
 		return -1;
-	int mm[4];
+	//int mm[4];
+	int* mm = new int[headLength];
 	setHDCPKeyCountHelp2(newKeyCount, mm);
-	for (int i = 0;i < 4;i++) {
+	for (int i = 0;i < headLength;i++) {
 		fputc(mm[i], OutFile);
 	}
 	return 0;
@@ -145,15 +157,17 @@ put 4 byte into file.represent the number of key in the file which type is 3
 int HDCPKeyCutTool::setHDCPKeyCount3(int newKeyCount) {
 	if (newKeyCount < 0)
 		return -1;
-	int mm[4];
+	//int mm[4];
+	int* mm = new int[headLength];
 	setHDCPKeyCountHelp3(newKeyCount, mm);
-	for (int i = 0;i < 4;i++) {
+	for (int i = 0;i < headLength;i++) {
 		fputc(mm[i], OutFile);
 	}
 	return 0;
 }
 
-/*1000个key显示为 00 00 03 E8*/
+/*Get key quantity from head in which type is 1.
+1000个key显示为 00 00 03 E8*/
 int HDCPKeyCutTool::readKeyCountFormat1(FILE * InFile, int headLength) {
 	int m;//current byte that getted from file
 	int sum = 0;//count of key
@@ -170,6 +184,47 @@ int HDCPKeyCutTool::readKeyCountFormat1(FILE * InFile, int headLength) {
 	return sum;
 }
 
+/*Get key quantity from head in which type is 2.
+1000个key显示为 00 00 0A 00*/
+int HDCPKeyCutTool::readKeyCountFormat2(FILE * InFile, int headLength) {
+	int m;//current byte that getted from file
+	int sum = 0;//count of key
+	int weights = 1;//weight of current byte
+	for (int i = 1;i < headLength;i++) {
+		weights *= 100;
+	}
+	for (int i = 0;i < headLength;i++) {
+		m = fgetc(InFile);
+		sum += m*weights;
+		weights /= 100;
+	}
+
+	return sum;
+}
+
+/*Get key quantity from head in which type is 3.
+1000个key显示为 00 00 10 00*/
+int HDCPKeyCutTool::readKeyCountFormat3(FILE * InFile, int headLength) {
+	int m;//current byte that getted from file
+	int sum = 0;//count of key
+	int digit = 0;//a digit of current HEX byte
+	int weights = 10;//weight of current digit
+	for (int i = 1;i < headLength;i++) {
+		weights *= 100;
+	}
+	for (int i = 0;i < headLength;i++) {
+		m = fgetc(InFile);
+		digit = m / 16;
+		sum += (digit*weights);
+		weights /= 10;
+
+		digit = m % 16;
+		sum += (digit*weights);
+		weights /= 10;
+	}
+
+	return sum;
+}
 
 int HDCPKeyCutTool::openFiles(char * inFile, char* outFile) {
 	//InFile = fopen(inFile, "rb");
@@ -283,13 +338,29 @@ int HDCPKeyCutTool::checkKeyFormat(char * inFile, int headLength, int keyLength,
 	int readKeyCount = 0;
 	if (keyCountFormat == 1) {
 		readKeyCount = readKeyCountFormat1(tempInFile, headLength);
-		cout << "read key quantitiy 1 = " << readKeyCount << endl;
+		cout << "read key quantitiy (Format 1) = " << readKeyCount << endl;
 		if (headLength + readKeyCount*keyLength != fileSize) {
 			cout << "keyLength or keyCountFormat not mach the file!" << endl;
 			fclose(tempInFile);
 			return 4;
 		}
-	}else {//TODO: Please finish other formats.
+	}else if (keyCountFormat == 2) {
+		readKeyCount = readKeyCountFormat2(tempInFile, headLength);
+		cout << "read key quantitiy (Format 2) = " << readKeyCount << endl;
+		if (headLength + readKeyCount*keyLength != fileSize) {
+			cout << "keyLength or keyCountFormat not mach the file!" << endl;
+			fclose(tempInFile);
+			return 4;
+		}
+	}else if (keyCountFormat == 3) {
+		readKeyCount = readKeyCountFormat3(tempInFile, headLength);
+		cout << "read key quantitiy (Format 3) = " << readKeyCount << endl;
+		if (headLength + readKeyCount*keyLength != fileSize) {
+			cout << "keyLength or keyCountFormat not mach the file!" << endl;
+			fclose(tempInFile);
+			return 4;
+		}
+	}else{
 		fclose(tempInFile);
 		cout << "keyCountFormat is wrong!" << endl;
 		return 4;
