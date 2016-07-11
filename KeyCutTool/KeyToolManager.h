@@ -5,6 +5,7 @@
 #include "HDCPKeyCutTool.h"
 class KeyToolManager {
 public:
+	~KeyToolManager();
 	int setInFile(char * inFile);
 	int setOutFile(char * out, char * filePrefix);
 	int setKeyType(int keyType);

@@ -2,6 +2,7 @@
 #define HDCP_KEY_CUT_TOOL_H
 #include <cstdio>
 #include <iostream>
+#include "ReturnType.h"
 class HDCPKeyCutTool {
 public:
 	~HDCPKeyCutTool();
